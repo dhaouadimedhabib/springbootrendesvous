@@ -8,5 +8,5 @@ RUN mvn clean install -DskipTests
 # Étape 2 : Créer l'image finale
 FROM openjdk:17-jdk-slim
 COPY --from=builder /app/target/pfe-0.0.1-SNAPSHOT.jar app.jar
-EXPOSE 8089
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app.jar"]
