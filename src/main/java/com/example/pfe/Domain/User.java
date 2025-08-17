@@ -26,7 +26,7 @@ import javax.validation.constraints.Size;
 @Setter
 @AllArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@Table(name = "user")
+@Table(name = "app_user")
 public class User {
     @Id
     @Column(nullable = false, updatable = false)
