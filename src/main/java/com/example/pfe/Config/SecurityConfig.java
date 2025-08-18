@@ -1,6 +1,5 @@
 package com.example.pfe.Config;
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,7 +10,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -19,52 +17,34 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
-                // Autoriser l'accès à certaines URL sans authentification
-                .antMatchers("/api/auth/signin").permitAll()
-                .antMatchers("/api/auth/signup").permitAll()
-                .antMatchers("/api/auth/*").permitAll()
-                .antMatchers("/api/RendezVous/*").permitAll()
-                .antMatchers("/api/Professionnel/*").permitAll()
-                .antMatchers("/api/reclamation/*").permitAll()
-                .antMatchers("/api/Disponibilite/*").permitAll()
-                .antMatchers("/api/user/*").permitAll()
-                .antMatchers("/**").permitAll()
-                .antMatchers("/api/paiement/payer/*").permitAll()
+            .csrf().disable() // désactive CSRF pour API REST
+            .cors()           // active CORS
+            .and()
+            .authorizeRequests()
+                .antMatchers("/api/auth/**").permitAll()        // signup / signin / google-signin
+                .antMatchers("/api/RendezVous/**").permitAll()
+                .antMatchers("/api/Professionnel/**").permitAll()
+                .antMatchers("/api/reclamation/**").permitAll()
+                .antMatchers("/api/Disponibilite/**").permitAll()
+                .antMatchers("/api/user/**").permitAll()
+                .antMatchers("/api/paiement/payer/**").permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/api/auth/google-signin").permitAll()
-
-                // Toutes les autres requêtes nécessitent une authentification
-                .anyRequest().authenticated()
-                .and()
-                .formLogin().disable()
-                .and()
-                .httpBasic()disable()
-                .and()
-                .logout()
-                .logoutUrl("/api/auth/logout") // URL for logging out
-                .logoutSuccessUrl("/login?logout") // Redirect after logout
-                .invalidateHttpSession(true) // Invalidate HTTP session
-                .deleteCookies("JSESSIONID") // Delete session cookies
-                .permitAll()
-                .and()
-                .csrf().disable()
-                .cors();
+                .anyRequest().authenticated()                   // toutes les autres requêtes doivent être authentifiées
+            .and()
+            .formLogin().disable()      // désactive le formulaire HTML
+            .httpBasic().disable();     // désactive HTTP Basic
     }
 
+    // Bean pour encoder les mots de passe
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // Bean pour AuthenticationManager
     @Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 }
-
-
-
-
-
